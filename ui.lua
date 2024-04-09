@@ -1970,4 +1970,4 @@ function uiBoxTab:Group(name, options)
 	return new
 end
 
-return uiTab
+return lib
