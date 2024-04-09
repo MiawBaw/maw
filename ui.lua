@@ -1563,7 +1563,7 @@ function lib.UiBase()
 	new.Gui = lib.Create("ScreenGui", {
 		Name = math.random(),
 		DisplayOrder = 1, --new escape menu
-		Parent = game.CoreGui
+		Parent = game.CoreGui,
 		
 		lib.Create("Frame", {
 			Name = "Tabs",
