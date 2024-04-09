@@ -1,6 +1,7 @@
 
+
 local Christmas = false
-local AprilFools = true
+local AprilFools = false
 do
 	local time = os.date("*t")
 	if time.month == 12 and (time.day >= 24 and time.day <= 26) then
@@ -1562,6 +1563,7 @@ function lib.UiBase()
 	new.Gui = lib.Create("ScreenGui", {
 		Name = math.random(),
 		DisplayOrder = 1, --new escape menu
+		Parent = game.CoreGui
 		
 		lib.Create("Frame", {
 			Name = "Tabs",
@@ -1582,6 +1584,37 @@ function lib.UiBase()
 	lib:RegisterKeybind(Enum.KeyCode.RightShift, function()
 		new.Gui.Enabled = not new.Gui.Enabled
 	end)
+
+	if AprilFools then
+		local gui = Instance.new("ScreenGui")
+		gui.Name = math.random()
+		gui.Parent = game.CoreGui
+
+		lib.ProtectedInstances[gui] = true
+		local troll = Instance.new("ImageLabel")
+		troll.BackgroundTransparency = 1
+		troll.Size = UDim2.new(0,200,0,200)
+		troll.Image = "rbxassetid://5873794859"
+		troll.Position = UDim2.new(1,0,0.7,0)
+		troll.Parent = gui
+		troll.Rotation = -20
+		local sound = Instance.new("Sound", gui)
+		sound.Volume = 1
+
+		local rnd = Random.new()
+		spawn(function()
+			while not shared.NoTroll do
+				wait(rnd:NextInteger(30, 240))
+				sound:Play()
+				troll:TweenPosition(UDim2.new(1,-150,0.7,0), nil, nil, 5, true)
+				wait(5 + 7)
+				troll:TweenPosition(UDim2.new(1,0,0.7,0), nil, nil, 5, true)
+				wait(5)
+				sound:Stop()
+			end
+		end)
+
+	end
 	
 	return new
 end
@@ -1724,6 +1757,7 @@ function lib.BoxUiBase(title)
 			})
 		})
 	})
+
 
 	new.BoxFrame = new.Gui.Main
 	new.Topbar = new.BoxFrame.Topbar
