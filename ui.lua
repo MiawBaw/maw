@@ -779,36 +779,38 @@ function uiTab:Dropdown(options, callback, id)
 		Values = {}
 	}
 	
-	for i,v in pairs(new.Values) do
-		local btn = lib.Create("TextButton", {
-			Name = v,
-			BackgroundColor3 = Color3.fromRGB(32, 34, 40),
-			BorderSizePixel = 0,
-			LayoutOrder = i-1,
-			Size = UDim2.new(1,0,0,30),
-			Font = "GothamSemibold",
-			Text = v,
-			TextColor3 = Color3.new(1,1,1),
-			TextSize = 16,
-			ZIndex = 2,
-			Parent = new.Dummy
-		})
-		new.Components.Values[i] = btn
-		btn.MouseButton1Click:Connect(function()
-			new:Select(i)
-		end)
+	function new:CreateValueButtons()
+		for i, v in ipairs(self.Values) do
+			local btn = lib.Create("TextButton", {
+				Name = v,
+				BackgroundColor3 = Color3.fromRGB(32, 34, 40),
+				BorderSizePixel = 0,
+				LayoutOrder = i-1,
+				Size = UDim2.new(1,0,0,30),
+				Font = "GothamSemibold",
+				Text = v,
+				TextColor3 = Color3.new(1,1,1),
+				TextSize = 16,
+				ZIndex = 2,
+				Parent = self.Dummy
+			})
+			self.Components.Values[i] = btn
+			btn.MouseButton1Click:Connect(function()
+				self:Select(i)
+			end)
+		end
 	end
+	
+	new:CreateValueButtons()
 	
 	function new:Expand(bool)
 		if bool then
 			local y = self.ContentUILayout.AbsoluteContentSize.Y
 			
 			self.DropdownFrame.Size = UDim2.new(1,0,0,y+5)
-			--self.Dummy:TweenSize(UDim2.new(1,0,0,y),nil,nil,0.4,true)
 			self.Dummy.Size = UDim2.new(1,0,0,y)
 		else
 			self.DropdownFrame.Size = UDim2.new(1,0,0,35)
-			--self.Dummy:TweenSize(UDim2.new(1,0,0,30),nil,nil,0.4,true)
 			self.Dummy.Size = UDim2.new(1,0,0,30)
 		end
 		self.ParentObj:Resize(true, 0.4)
@@ -835,6 +837,34 @@ function uiTab:Dropdown(options, callback, id)
 		
 		lib:RaiseGlobalClickEvent(self)
 		self.Callback(self.Values[idx])
+	end
+	
+	function new:Update(newValues, keepSelection)
+		-- Clear existing buttons
+		for _, btn in pairs(self.Components.Values) do
+			btn:Destroy()
+		end
+		
+		-- Update values
+		self.Values = newValues
+		self.Components.Values = {}
+		
+		-- Recreate buttons
+		self:CreateValueButtons()
+		
+		-- Update selection
+		if keepSelection and self.Selected and self.Selected <= #newValues then
+			self:Select(self.Selected)
+		elseif #newValues > 0 then
+			self:Select(1)
+		else
+			self.Selected = nil
+		end
+		
+		-- Update size
+		if self.Opened then
+			self:Expand(true)
+		end
 	end
 	
 	if options.Radio then
