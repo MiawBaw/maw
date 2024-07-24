@@ -145,7 +145,7 @@ function uiTab:CheckBox(name, callback, id)
 	new.CheckBoxFrame = lib.Create("Frame", {
 		Name = name,
 		BackgroundTransparency = 1,
-		LayoutOrder = #self.Children,
+		LayoutOrder = #self.Children, --0, 1, 2
 		Size = UDim2.new(1,0,0,25),
 		Parent = self.ContentFrame,
 		
@@ -201,6 +201,7 @@ function uiTab:CheckBox(name, callback, id)
 	new.Components = {
 		Toggle = {
 			Object = new.CheckBoxFrame.Toggle,
+			
 			DefaultColor = Color3.fromRGB(255, 170, 0),
 			DisabledColor = Color3.fromRGB(43, 47, 55),
 			ChangeColor = true,
@@ -208,11 +209,13 @@ function uiTab:CheckBox(name, callback, id)
 		},
 		Filler = {
 			Object = new.CheckBoxFrame.Toggle.Filler,
+			
 			DefaultColor = Color3.fromRGB(26, 28, 32),
 			ChangeColor = false,
 		},
 		Inner = {
 			Object = new.CheckBoxFrame.Toggle.Filler.Inner,
+			
 			DefaultColor = Color3.fromRGB(255, 170, 0),
 			DisabledColor = Color3.fromRGB(26, 28, 32),
 			ChangeColor = true,
@@ -220,6 +223,7 @@ function uiTab:CheckBox(name, callback, id)
 		},
 		Label = {
 			Object = new.CheckBoxFrame.Toggle.Label,
+			
 			DefaultColor = Color3.new(1,1,1),
 			DisabledColor = Color3.fromRGB(95, 96, 99),
 			ChangeColor = true,
@@ -227,6 +231,7 @@ function uiTab:CheckBox(name, callback, id)
 		}
 	}
 	
+	--fix checkbox label size--
 	do
 		local label = new.Components.Label.Object
 		label.Size = UDim2.new(0,game:GetService("TextService"):GetTextSize(label.Text, label.TextSize, label.Font, Vector2.new(999,999)).X, 1, 0)
@@ -234,8 +239,10 @@ function uiTab:CheckBox(name, callback, id)
 	
 	function new:SetLabelColor(color)
 		local label = self.Components.Label
+		
 		label.DefaultColor = color
 		label.DisabledColor = lib.DimColor(color)
+		
 		if self.Checked then
 			label.Object.TextColor3 = label.DefaultColor
 		else
@@ -246,8 +253,9 @@ function uiTab:CheckBox(name, callback, id)
 	function new:SetMultiLine()
 		local label = self.Components.Label.Object
 		label.TextYAlignment = "Top"
+		
 		local y = game:GetService("TextService"):GetTextSize(label.Text, label.TextSize, label.Font, Vector2.new(999,999)).Y
-		y = y + 7
+		y = y + 7 --offset
 		self.CheckBoxFrame.Size = UDim2.new(1,0,0,y)
 		self.ParentObj:Resize()
 	end
@@ -256,7 +264,7 @@ function uiTab:CheckBox(name, callback, id)
 		local bindBox = lib.Create("TextBox", {
 			Name = "Keybind",
 			BackgroundTransparency = 1,
-			Position = UDim2.new(1,-37,0,0),
+			Position = UDim2.new(1,-37,0,0), -- -37 = -32 (width) and -5 (padding)
 			Size = UDim2.new(0,32,0,22),
 			Font = "GothamSemibold",
 			TextColor3 = self.Checked and Color3.new(1,1,1) or Color3.fromRGB(95, 96, 99),
@@ -272,17 +280,21 @@ function uiTab:CheckBox(name, callback, id)
 			CurrentKey = key,
 			Type = "Keybind",
 			Id = id,
+			
 			DefaultColor = Color3.new(1,1,1),
 			DisabledColor = Color3.fromRGB(95, 96, 99),
 			ChangeColor = true,
 			Property = "TextColor3",
+
 			SetKey = function(self, keyCode)
 				lib:RemoveKeybind(new.Components.Keybind.CurrentKey)
+
 				if keyCode == Enum.KeyCode.Delete or keyCode == Enum.KeyCode.Backspace then
 					self.CurrentKey = "-"
 					bindBox.Text = "-"
 					return
 				end
+				
 				self.CurrentKey = keyCode
 				lib:RegisterKeybind(self.CurrentKey, new.Click)
 				wait()
@@ -308,16 +320,17 @@ function uiTab:CheckBox(name, callback, id)
 		table.insert(lib.GuiObjects, self.Components.Keybind)
 	end
 	
-	function new:UpdateState(checked, triggerCallback)
-		if self.Checked == checked then
+	function new.Click(invoke, ...)
+		if not new.Enabled then
 			return
 		end
-
-		self.Checked = checked
-		local index = self.Checked and "DefaultColor" or "DisabledColor"
 		
-		for _, v in pairs(self.Components) do
+		new.Checked = not new.Checked
+		local index = new.Checked == true and "DefaultColor" or new.Checked == false and "DisabledColor"
+		
+		for i,v in pairs(new.Components) do
 			if v.ChangeColor then
+				--v.Object[v.Property] = v[index]
 				if v.Tween then
 					v.Tween:Pause()
 				end
@@ -325,17 +338,9 @@ function uiTab:CheckBox(name, callback, id)
 			end
 		end
 		
-		if triggerCallback then
-			self.Callback(self.Checked)
+		if self.Opened == false then
+			self:Expand(true)
 		end
-	end
-	
-	function new.Click(invoke, ...)
-		if not new.Enabled then
-			return
-		end
-		
-		new:UpdateState(not new.Checked, false)
 		
 		if invoke ~= false then
 			lib:RaiseGlobalClickEvent(new)
@@ -349,14 +354,6 @@ function uiTab:CheckBox(name, callback, id)
 	new.Components.Filler.Object.MouseButton1Click:Connect(new.Click)
 	new.Components.Inner.Object.MouseButton1Click:Connect(new.Click)
 	new.Components.Label.Object.MouseButton1Click:Connect(new.Click)
-
-	function new:GetType()
-		return self.Type
-	end
-
-	function new:GetValue()
-		return self.Checked
-	end
 
 	self:Resize()
 	table.insert(self.Children, new)
