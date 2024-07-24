@@ -350,6 +350,14 @@ function uiTab:CheckBox(name, callback, id)
 	new.Components.Inner.Object.MouseButton1Click:Connect(new.Click)
 	new.Components.Label.Object.MouseButton1Click:Connect(new.Click)
 
+	function new:GetType()
+		return self.Type
+	end
+
+	function new:GetValue()
+		return self.Checked
+	end
+
 	self:Resize()
 	table.insert(self.Children, new)
 	table.insert(lib.GuiObjects, new)
@@ -860,6 +868,17 @@ function uiTab:Dropdown(options, callback, id)
 		if self.Opened then
 			self:Expand(true)
 		end
+	end
+	
+	function new:GetType()
+		return self.Type
+	end
+	
+	function new:GetCurrentValue()
+		if self.Selected then
+			return self.Values[self.Selected]
+		end
+		return nil
 	end
 	
 	if options.Radio then
