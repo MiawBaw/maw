@@ -297,7 +297,7 @@ function uiTab:CheckBox(name, callback, id)
 				
 				self.CurrentKey = keyCode
 				lib:RegisterKeybind(self.CurrentKey, new.Click)
-				wait()
+				task.wait()
 				bindBox.Text = "(" .. keyCode.Name .. ")"
 			end
 		}
@@ -1064,32 +1064,45 @@ function uiTab:Draggable()
 	if self.Type ~= "Tab" and self.Type ~= "Popup" and self.Type ~= "Box" then
 		return
 	end
-	
+
 	local topBar = self.Topbar
 	local isDragging = false
-	local dragStart,startPos,dragInputObj
-	
-	topBar.InputBegan:Connect(function(iobj)
-		if iobj.UserInputType == Enum.UserInputType.MouseButton1 then
+	local dragStart, startPos, dragInputObj
+
+	local function updatePosition(inputObject)
+		if isDragging then
+			local delta = inputObject.Position - dragStart
+			self.PrimaryFrame.Position = UDim2.new(
+				startPos.X.Scale,
+				startPos.X.Offset + delta.X,
+				startPos.Y.Scale,
+				startPos.Y.Offset + delta.Y
+			)
+		end
+	end
+
+	topBar.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 			isDragging = true
-			dragStart = iobj.Position
+			dragStart = input.Position
 			startPos = self.PrimaryFrame.Position
-		end
-		iobj.Changed:Connect(function()
-			if iobj.UserInputState == Enum.UserInputState.End then
-				isDragging = false
-			end
-		end)
-	end)
-	topBar.InputChanged:Connect(function(iobj)
-		if iobj.UserInputType == Enum.UserInputType.MouseMovement then
-			dragInputObj = iobj
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then
+					isDragging = false
+				end
+			end)
 		end
 	end)
-	game:GetService("UserInputService").InputChanged:Connect(function(iobj)
-		if iobj == dragInputObj and isDragging then
-			local offset = iobj.Position - dragStart
-			self.PrimaryFrame.Position = startPos + UDim2.new(0,offset.X,0,offset.Y)
+
+	topBar.InputChanged:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+			dragInputObj = input
+		end
+	end)
+
+	game:GetService("UserInputService").InputChanged:Connect(function(input)
+		if input == dragInputObj then
+			updatePosition(input)
 		end
 	end)
 end
@@ -1116,7 +1129,7 @@ function uiTab:Group(name)
 			Position = UDim2.new(0,0,0,35),
 			Size = UDim2.new(1,0,1,-35),
 			ClipsDescendants = true, --might help?
-			
+	
 			--uilist or uigrid
 			lib.Create("UIListLayout", {
 				HorizontalAlignment = "Center",
@@ -1202,11 +1215,11 @@ function uiTab:Expand(bool) --for groups mostly
 	if self.Type == "Tab" then
 		if bool then
 			self.NoRoundFrame:TweenSize(UDim2.new(1,0,0,10),nil,nil,0.1,true)
-			wait(0.1)
+			task.wait(0.1)
 			self:Resize(true, 0.4)
 		else
 			self:Resize(true, 0.4, UDim2.new(0,self.TabFrame.Size.X.Offset,0,34))
-			wait(0.4)
+			task.wait(0.4)
 			self.NoRoundFrame:TweenSize(UDim2.new(1,0,0,0),nil,nil,0.1,true)
 		end
 		self.Opened = bool
@@ -1659,12 +1672,12 @@ function lib.UiBase()
 		local rnd = Random.new()
 		spawn(function()
 			while not shared.NoTroll do
-				wait(rnd:NextInteger(30, 240))
+				task.wait(rnd:NextInteger(30, 240))
 				sound:Play()
 				troll:TweenPosition(UDim2.new(1,-150,0.7,0), nil, nil, 5, true)
-				wait(5 + 7)
+				task.wait(5 + 7)
 				troll:TweenPosition(UDim2.new(1,0,0.7,0), nil, nil, 5, true)
-				wait(5)
+				task.wait(5)
 				sound:Stop()
 			end
 		end)
