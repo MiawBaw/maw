@@ -371,7 +371,8 @@ function uiTab:Slider(options, callback, id)
 		Type = "Slider",
 		Callback = callback,
 		SliderParent = options.Parent,
-		Id = id
+		Id = id,
+		IsDragging = false
 	}
 	
 	new.SliderFrame = lib.Create("Frame", {
@@ -527,41 +528,54 @@ function uiTab:Slider(options, callback, id)
 	end
 	
 	--drag handler--
-	local isMouseDown = false
-	
-	local function mouseDown()
-		if isMouseDown then
-			return
-		end
-		isMouseDown = true
+	local function updateSlider(input)
+		if not new.IsDragging then return end
 		
 		local size = new.Bar.AbsoluteSize.X
 		local offset = new.Draggable.AbsoluteSize.X/2 --grab it in the middle
 		
-		local p = math.clamp((lib.Mouse.X - new.Bar.AbsolutePosition.X - offset)/size,0,1)
-		while isMouseDown do
-			local p = math.clamp((lib.Mouse.X - new.Bar.AbsolutePosition.X - offset)/size,0,1)
-			
-			if p > 0.03 and p < 0.97 then --otherwise it's sliding
-				new.Draggable:TweenPosition(UDim2.new(p,0,0.5,0), nil, nil, 1/15, true)
-				new.Filler:TweenSize(UDim2.new(p,3,1,0), nil, nil, 1/15, true)
-			else
-				new.Draggable.Position = UDim2.new(p,0,0.5,0)
-				new.Filler.Size = UDim2.new(p,3,1,0)
-			end
-			new.ValuePercent = new.Draggable.Position.X.Scale
-			new.Value = math.floor(lib.CalculateValFromPercent(new.Min, new.Max, new.ValuePercent) * 10^new.Fraction)/10^new.Fraction
-			
-			new.Label.Text = new.Callback(new.Value)
-			wait()
+		local inputPosition = input.Position
+		if input.UserInputType == Enum.UserInputType.Touch then
+			inputPosition = input.Position.X
 		end
+		
+		local p = math.clamp((inputPosition - new.Bar.AbsolutePosition.X - offset)/size, 0, 1)
+		
+		if p > 0.03 and p < 0.97 then --otherwise it's sliding
+			new.Draggable:TweenPosition(UDim2.new(p,0,0.5,0), nil, nil, 1/15, true)
+			new.Filler:TweenSize(UDim2.new(p,3,1,0), nil, nil, 1/15, true)
+		else
+			new.Draggable.Position = UDim2.new(p,0,0.5,0)
+			new.Filler.Size = UDim2.new(p,3,1,0)
+		end
+		new.ValuePercent = new.Draggable.Position.X.Scale
+		new.Value = math.floor(lib.CalculateValFromPercent(new.Min, new.Max, new.ValuePercent) * 10^new.Fraction)/10^new.Fraction
+		
+		new.Label.Text = new.Callback(new.Value)
 	end
-	new.ClickCapture.MouseButton1Down:Connect(mouseDown)
-	new.Draggable.MouseButton1Down:Connect(mouseDown)
 	
-	game:GetService("UserInputService").InputEnded:Connect(function(iobj, _gp)
-		if isMouseDown and (iobj.UserInputType == Enum.UserInputType.MouseButton1) then
-			isMouseDown = false
+	new.ClickCapture.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			new.IsDragging = true
+			updateSlider(input)
+		end
+	end)
+	
+	new.Draggable.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			new.IsDragging = true
+		end
+	end)
+	
+	game:GetService("UserInputService").InputChanged:Connect(function(input)
+		if new.IsDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+			updateSlider(input)
+		end
+	end)
+	
+	game:GetService("UserInputService").InputEnded:Connect(function(input)
+		if new.IsDragging and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
+			new.IsDragging = false
 			new.ValuePercent = new.Draggable.Position.X.Scale
 			new.Value = math.floor(lib.CalculateValFromPercent(new.Min, new.Max, new.ValuePercent) * 10^new.Fraction)/10^new.Fraction
 			new.Draggable:TweenPosition(UDim2.new(new.ValuePercent,0,0.5,0), nil, nil, 0, true)
