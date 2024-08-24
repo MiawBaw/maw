@@ -1873,208 +1873,182 @@ function uiBox:Select(idx)
 end
 
 function uiBox:Tab(title)
-	local new = setmetatable({
-		Type = "BoxTab",
-		Children = {},
-		ParentObj = self
-	}, uiBoxTab)
+    local new = setmetatable({
+        Type = "BoxTab",
+        Children = {},
+        ParentObj = self
+    }, uiBoxTab)
 
-	new.CarouselTab = lib.Create("Frame", {
-		Name = title,
-		BackgroundTransparency = 1,
-		LayoutOrder = #self.Tabs,
-		Size = UDim2.new(1,-3,0,40), -- Reduced height from 50
-		Parent = self.CarouselContentFrame,
+    new.CarouselTab = lib.Create("Frame", {
+        Name = title,
+        BackgroundTransparency = 1,
+        LayoutOrder = #self.Tabs,
+        Size = UDim2.new(1,-3,0,30),
+        Parent = self.CarouselContentFrame,
 
-		lib.Create("Frame", {
-			Name = "Filler",
-			BackgroundColor3 = Color3.fromRGB(61, 65, 75),
-			BorderSizePixel = 0,
-			Position = UDim2.new(0,5,0,5),
-			Size = UDim2.new(1,-10,1,-10),
-			Visible = false,
+        lib.Create("Frame", {
+            Name = "Filler",
+            BackgroundColor3 = Color3.fromRGB(61, 65, 75),
+            BorderSizePixel = 0,
+            Position = UDim2.new(0,3,0,3),
+            Size = UDim2.new(1,-6,1,-6),
+            Visible = false,
 
-			lib.Create("UICorner", {
-				CornerRadius = UDim.new(0,10)
-			})
-		}),
-		lib.Create("Frame", {
-			Name = "Separator",
-			BackgroundColor3 = Color3.fromRGB(213, 213, 213),
-			BorderSizePixel = 0,
-			Position = UDim2.new(0,5,1,-1),
-			Size = UDim2.new(1,-10,0,1),
-		}),
-		lib.Create("TextButton", {
-			Name = "ClickCapture",
-			BackgroundTransparency = 1,
-			Size = UDim2.new(1,0,1,0),
-			Text = "",
-			ZIndex = 2
-		}),
-		lib.Create("TextLabel", {
-			BackgroundTransparency = 1,
-			Size = UDim2.new(1,0,1,0),
-			Font = "SourceSansSemibold",
-			TextSize = 14, -- Reduced from 19
-			Text = title,
-			TextColor3 = Color3.fromRGB(213, 213, 213),
-		})
-	})
+            lib.Create("UICorner", {
+                CornerRadius = UDim.new(0,6)
+            })
+        }),
+        lib.Create("TextButton", {
+            Name = "ClickCapture",
+            BackgroundTransparency = 1,
+            Size = UDim2.new(1,0,1,0),
+            Text = "",
+            ZIndex = 2
+        }),
+        lib.Create("TextLabel", {
+            BackgroundTransparency = 1,
+            Size = UDim2.new(1,0,1,0),
+            Font = "SourceSansSemibold",
+            TextSize = 12,
+            Text = title,
+            TextColor3 = Color3.fromRGB(213, 213, 213),
+        })
+    })
 
-	-- The rest of the function remains the same
-	new.ContentFrame = lib.Create("ScrollingFrame", {
-		Name = title,
-		BackgroundTransparency = 1,
-		BorderSizePixel = 0,
-		Size = UDim2.new(1,0,1,0),
-		ClipsDescendants = true,
-		ScrollBarThickness = 4,
-		CanvasSize = UDim2.new(),
-		Parent = self.TabsFrame,
-		Visible = false,
+    new.ContentFrame = lib.Create("ScrollingFrame", {
+        Name = title,
+        BackgroundTransparency = 1,
+        BorderSizePixel = 0,
+        Size = UDim2.new(1,0,1,0),
+        ClipsDescendants = true,
+        ScrollBarThickness = 4,
+        CanvasSize = UDim2.new(1,0,0,0),
+        Parent = self.TabsFrame,
+        Visible = false,
 
-		lib.Create("UIPadding", {
-			PaddingLeft = UDim.new(0, 5),
-			PaddingRight = UDim.new(0, 5),
-			PaddingTop = UDim.new(0, 5),
-			PaddingBottom = UDim.new(0, 5)
-		})
-	})
+        lib.Create("UIPadding", {
+            PaddingLeft = UDim.new(0, 5),
+            PaddingRight = UDim.new(0, 5),
+            PaddingTop = UDim.new(0, 5),
+            PaddingBottom = UDim.new(0, 5)
+        }),
+        lib.Create("UIGridLayout", {
+            CellPadding = UDim2.new(0, 5, 0, 5),
+            CellSize = UDim2.new(0.5, -5, 0, 0),
+            SortOrder = Enum.SortOrder.LayoutOrder,
+            VerticalAlignment = Enum.VerticalAlignment.Top
+        })
+    })
 
-	new.ClickCapture = new.CarouselTab.ClickCapture
-	new.ClickCapture.MouseButton1Down:Connect(function()
-		self:Select(new.Index)
-	end)
+    new.ClickCapture = new.CarouselTab.ClickCapture
+    new.ClickCapture.MouseButton1Down:Connect(function()
+        self:Select(new.Index)
+    end)
 
-	table.insert(self.Tabs, new)
-	new.Index = #self.Tabs
-	if #self.Tabs == 1 then
-		self:Select(1)
-	end
+    table.insert(self.Tabs, new)
+    new.Index = #self.Tabs
+    if #self.Tabs == 1 then
+        self:Select(1)
+    end
 
-	function new:Resize()
-		for _,v in pairs(self.Children) do
-			v:Position()
-		end
-		local Y = 5
-		for i,v in pairs(self.Children) do
-			local posY = v.PrimaryFrame.Position.Y.Offset + v.PrimaryFrame.Size.Y.Offset + 5
-			if posY > Y then
-				Y = posY
-			end
-		end
-		self.ContentFrame.CanvasSize = UDim2.new(0,0,0,Y)
-	end
+    function new:Resize()
+        local gridLayout = self.ContentFrame:FindFirstChildOfClass("UIGridLayout")
+        local contentSize = gridLayout.AbsoluteContentSize
+        self.ContentFrame.CanvasSize = UDim2.new(0, 0, 0, contentSize.Y + 10)
+        
+        for _, group in pairs(self.Children) do
+            group.GroupFrame.Size = UDim2.new(1, 0, 0, group.GroupFrame.Group.Content.UIListLayout.AbsoluteContentSize.Y + 25)
+        end
+    end
 
-	return new
+    return new
 end
 
 function uiBoxTab:Group(name, options)
-	local new = setmetatable({
-		Type = "BoxGroup",
-		Children = {},
-		Collumn = options.Collumn,
-		ParentObj = self
-	}, uiTab)
+    local new = setmetatable({
+        Type = "BoxGroup",
+        Children = {},
+        Column = options.Column or 1,
+        ParentObj = self
+    }, uiTab)
 
-	new.GroupFrame = lib.Create("Frame", {
-		Name = "Group - " .. name,
-		BackgroundTransparency = 1,
-		Size = UDim2.new(0, options.Width or 150, 0, 20), -- Reduced width and initial height
-		ClipsDescendants = true,
-		LayoutOrder = #self.Children,
-		Parent = self.ContentFrame,
+    new.GroupFrame = lib.Create("Frame", {
+        Name = "Group - " .. name,
+        BackgroundTransparency = 1,
+        Size = UDim2.new(0.48, -5, 0, 20), -- Adjust width to be slightly less than half
+        ClipsDescendants = true,
+        LayoutOrder = #self.Children,
+        Parent = self.ContentFrame,
 
-		lib.Create("Frame", {
-			Name = "Group",
-			BackgroundColor3 = Color3.fromRGB(213, 213, 213),
-			BorderSizePixel = 0,
-			Position = UDim2.new(0,0,0,8), -- Adjusted position
-			Size = UDim2.new(1,0,1,-8),
+        lib.Create("Frame", {
+            Name = "Group",
+            BackgroundColor3 = Color3.fromRGB(61, 65, 75),
+            BorderSizePixel = 0,
+            Position = UDim2.new(0,0,0,8),
+            Size = UDim2.new(1,0,1,-8),
 
-			lib.Create("UICorner", {
-				CornerRadius = UDim.new(0,8) -- Reduced corner radius
-			}),
-			lib.Create("Frame", {
-				Name = "Filler",
-				BackgroundColor3 = Color3.fromRGB(26, 28, 32),
-				BorderSizePixel = 0,
-				Position = UDim2.new(0,1,0,1),
-				Size = UDim2.new(1,-2,1,-2),
+            lib.Create("UICorner", {
+                CornerRadius = UDim.new(0,6)
+            }),
+            lib.Create("Frame", {
+                Name = "Content",
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0,2,0,16),
+                Size = UDim2.new(1,-4,1,-18),
 
-				lib.Create("UICorner", {
-					CornerRadius = UDim.new(0,8) -- Reduced corner radius
-				})
-			}),
-			lib.Create("Frame", {
-				Name = "Content",
-				BackgroundTransparency = 1,
-				Position = UDim2.new(0,2,0,16), -- Adjusted position
-				Size = UDim2.new(1,-4,1,-18), -- Adjusted size
+                lib.Create("UIListLayout", {
+                    SortOrder = "LayoutOrder",
+                    HorizontalAlignment = "Center",
+                    Padding = UDim.new(0, 2)
+                })
+            })
+        }),
+        lib.Create("TextLabel", {
+            Name = "Title",
+            BackgroundColor3 = Color3.fromRGB(26, 28, 32),
+            BorderSizePixel = 0,
+            Position = UDim2.new(0,5,0,0),
+            Font = "SourceSansSemibold",
+            Text = name,
+            TextColor3 = Color3.fromRGB(213, 213, 213),
+            TextSize = 12,
+        })
+    })
 
-				lib.Create("UIListLayout", {
-					SortOrder = "LayoutOrder",
-					HorizontalAlignment = "Center",
-					Padding = UDim.new(0, 4) -- Added small padding between elements
-				})
-			})
-		}),
-		lib.Create("TextLabel", {
-			Name = "Title",
-			BackgroundColor3 = Color3.fromRGB(26, 28, 32),
-			BorderSizePixel = 0,
-			Position = UDim2.new(0,10,0,0),
-			Font = "SourceSans",
-			Text = name,
-			TextColor3 = Color3.fromRGB(213, 213, 213),
-			TextSize = 14, -- Reduced text size
-		})
-	})
+    do
+        local titleLabel = new.GroupFrame.Title
+        titleLabel.Size = UDim2.new(0, game:GetService("TextService"):GetTextSize(titleLabel.Text, titleLabel.TextSize, titleLabel.Font, Vector2.new(999,999)).X + 8, 0, 14)
+    end
 
-	do
-		local titleLabel = new.GroupFrame.Title
-		titleLabel.Size = UDim2.new(0, game:GetService("TextService"):GetTextSize(titleLabel.Text, titleLabel.TextSize, titleLabel.Font, Vector2.new(999,999)).X + 10, 0, 16)
-	end
+    new.PrimaryFrame = new.GroupFrame
+    new.ContentFrame = new.GroupFrame.Group.Content
+    new.ContentUILayout = new.ContentFrame.UIListLayout
 
-	new.PrimaryFrame = new.GroupFrame
-	new.ContentFrame = new.GroupFrame.Group.Content
-	new.ContentUILayout = new.ContentFrame.UIListLayout
+    function new:Position()
+        local column = self.Column
+        local X = (column - 1) * (0.5 * self.ParentObj.ContentFrame.AbsoluteSize.X)
+        local Y = 5
+        
+        for i, v in pairs(self.ParentObj.Children) do
+            if v == self then break end
+            if v.Column == column then
+                Y = v.GroupFrame.Position.Y.Offset + v.GroupFrame.AbsoluteSize.Y + 5
+            end
+        end
+        
+        new.GroupFrame.Position = UDim2.new(0, X, 0, Y)
+    end
 
-	function new:Position()
-		local collumn = options.Collumn
-		local X, Y = 10, 5 -- Reduced initial position
-		if self.GroupFrame.LayoutOrder > 0 then
-			local found = false
-			for i,v in pairs(self.ParentObj.Children) do
-				if v == self then
-					break
-				end
-				if v.Collumn == collumn then
-					X = v.GroupFrame.Position.X.Offset
-					Y = v.GroupFrame.Position.Y.Offset + v.GroupFrame.AbsoluteSize.Y + 5 -- Reduced spacing
-					found = true
-				end
-			end
+    if options.Position then
+        new.GroupFrame.Position = options.Position
+    else
+        new:Position()
+    end
+    
+    table.insert(self.Children, new)
+    self:Resize()
 
-			if not found then
-				local prev = self.ParentObj.Children[self.GroupFrame.LayoutOrder].PrimaryFrame
-				X = prev.Position.X.Offset + prev.AbsoluteSize.X + 10 -- Reduced spacing
-			end
-		end
-		new.GroupFrame.Position = UDim2.new(0,X,0,Y)
-	end
-
-	if options.Position then
-		new.GroupFrame.Position = options.Position
-	else
-		new:Position()
-	end
-	
-	table.insert(self.Children, new)
-	self:Resize()
-
-	return new
+    return new
 end
 
 return lib
