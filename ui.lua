@@ -1712,12 +1712,12 @@ function lib.BoxUiBase(title)
 			BackgroundColor3 = Color3.fromRGB(255, 170, 0),
 			BorderSizePixel = 0,
 			Position = UDim2.new(0.5,0,0.5,0),
-			Size = UDim2.new(0,700,0,539),
+			Size = UDim2.new(0.9,0,0.8,0), -- Changed to be relative to screen size
 			
 			lib.Create("Frame", {
 				Name = "Topbar",
 				BackgroundTransparency = 1,
-				Size = UDim2.new(1,0,0,40),
+				Size = UDim2.new(1,0,0,30), -- Reduced height
 			}),
 			lib.Create("TextButton", {
 				Name = "MouseUnlock",
@@ -1728,16 +1728,16 @@ function lib.BoxUiBase(title)
 				Text = ""
 			}),
 			lib.Create("UICorner", {
-				CornerRadius = UDim.new(0,13)
+				CornerRadius = UDim.new(0,10) -- Slightly reduced corner radius
 			}),
 			lib.Create("TextLabel", {
 				Name = "Title",
 				BackgroundTransparency = 1,
-				Position = UDim2.new(0,20,0,0),
-				Size = UDim2.new(1,-20,0,40),
+				Position = UDim2.new(0,15,0,0),
+				Size = UDim2.new(1,-15,0,30),
 				Font = "SourceSansSemibold",
 				Text = title or "",
-				TextSize = 32,
+				TextSize = 24, -- Reduced text size
 				TextXAlignment = "Left",
 				TextColor3 = Color3.new(1,1,1)
 			}),
@@ -1745,22 +1745,22 @@ function lib.BoxUiBase(title)
 				Name = "NoRound",
 				BackgroundColor3 = Color3.fromRGB(255, 170, 0),
 				BorderSizePixel = 0,
-				Position = UDim2.new(0,0,1,-10),
-				Size = UDim2.new(1,0,0,10)
+				Position = UDim2.new(0,0,1,-8),
+				Size = UDim2.new(1,0,0,8)
 			}),
 	
 			lib.Create("Frame", {
 				Name = "Inner",
 				BackgroundTransparency = 1,
-				Position = UDim2.new(0,10,0,40),
-				Size = UDim2.new(1,-10,1,-40),
+				Position = UDim2.new(0,8,0,30),
+				Size = UDim2.new(1,-8,1,-30),
 	
 				lib.Create("Frame", {
 					Name = "NoRoundBottom",
 					BackgroundColor3 = Color3.fromRGB(26, 28, 32),
 					BorderSizePixel = 0,
-					Position = UDim2.new(0,0,1,-10),
-					Size = UDim2.new(1,0,0,10)
+					Position = UDim2.new(0,0,1,-8),
+					Size = UDim2.new(1,0,0,8)
 				}),
 				lib.Create("Frame", {
 					Name = "Content",
@@ -1769,26 +1769,26 @@ function lib.BoxUiBase(title)
 					Size = UDim2.new(1,0,1,0),
 	
 					lib.Create("UICorner", {
-						CornerRadius = UDim.new(0,13)
+						CornerRadius = UDim.new(0,10) -- Slightly reduced corner radius
 					}),
 					lib.Create("Frame", {
 						Name = "Carousel",
 						BackgroundTransparency = 1,
-						Size = UDim2.new(0,150,1,0),
+						Size = UDim2.new(0,120,1,0), -- Reduced width
 	
 						lib.Create("Frame", {
 							Name = "NoRound",
 							BackgroundColor3 = Color3.fromRGB(48, 51, 59),
 							BorderSizePixel = 0,
-							Position = UDim2.new(0,0,1,-10),
-							Size = UDim2.new(1,0,0,10)
+							Position = UDim2.new(0,0,1,-8),
+							Size = UDim2.new(1,0,0,8)
 						}),
 						lib.Create("Frame", {
 							Name = "NoRoundTop",
 							BackgroundColor3 = Color3.fromRGB(48, 51, 59),
 							BorderSizePixel = 0,
-							Position = UDim2.new(1,-20,0,0),
-							Size = UDim2.new(0,20,0,10)
+							Position = UDim2.new(1,-16,0,0),
+							Size = UDim2.new(0,16,0,8)
 						}),
 	
 						lib.Create("Frame", {
@@ -1799,14 +1799,14 @@ function lib.BoxUiBase(title)
 
 	
 							lib.Create("UICorner", {
-								CornerRadius = UDim.new(0,13)
+								CornerRadius = UDim.new(0,10) -- Slightly reduced corner radius
 							}),
 							lib.Create("ScrollingFrame", {
 								Name = "List",
 								BackgroundTransparency = 1,
 								Size = UDim2.new(1,0,1,0),
 								ClipsDescendants = true,
-								ScrollBarThickness = 6,
+								ScrollBarThickness = 4, -- Reduced scrollbar thickness
 								CanvasSize = UDim2.new(),
 	
 								lib.Create("UIListLayout", {
@@ -1819,14 +1819,13 @@ function lib.BoxUiBase(title)
 						Name = "Tabs",
 						BackgroundColor3 = Color3.fromRGB(26, 28, 32),
 						BorderSizePixel = 0,
-						Position = UDim2.new(0,150,0,0),
-						Size = UDim2.new(1,-150,1,0),
+						Position = UDim2.new(0,120,0,0), -- Adjusted for reduced Carousel width
+						Size = UDim2.new(1,-120,1,0), -- Adjusted for reduced Carousel width
 					})
 				})
 			})
 		})
 	})
-
 
 	new.BoxFrame = new.Gui.Main
 	new.Topbar = new.BoxFrame.Topbar
