@@ -1703,7 +1703,7 @@ function lib.BoxUiBase(title)
 
 	new.Gui = lib.Create("ScreenGui", {
 		Name = math.random(),
-		DisplayOrder = 1, --new escape menu
+		DisplayOrder = 1,
 		Parent = game.CoreGui,
 		
 		lib.Create("Frame", {
@@ -1712,12 +1712,12 @@ function lib.BoxUiBase(title)
 			BackgroundColor3 = Color3.fromRGB(255, 170, 0),
 			BorderSizePixel = 0,
 			Position = UDim2.new(0.5,0,0.5,0),
-			Size = UDim2.new(0.9,0,0.8,0), -- Changed to be relative to screen size
+			Size = UDim2.new(0,350,0,270), -- Reduced from 700x539
 			
 			lib.Create("Frame", {
 				Name = "Topbar",
 				BackgroundTransparency = 1,
-				Size = UDim2.new(1,0,0,30), -- Reduced height
+				Size = UDim2.new(1,0,0,30), -- Reduced from 40
 			}),
 			lib.Create("TextButton", {
 				Name = "MouseUnlock",
@@ -1728,16 +1728,16 @@ function lib.BoxUiBase(title)
 				Text = ""
 			}),
 			lib.Create("UICorner", {
-				CornerRadius = UDim.new(0,10) -- Slightly reduced corner radius
+				CornerRadius = UDim.new(0,10) -- Reduced from 13
 			}),
 			lib.Create("TextLabel", {
 				Name = "Title",
 				BackgroundTransparency = 1,
-				Position = UDim2.new(0,15,0,0),
-				Size = UDim2.new(1,-15,0,30),
+				Position = UDim2.new(0,10,0,0),
+				Size = UDim2.new(1,-10,0,30),
 				Font = "SourceSansSemibold",
 				Text = title or "",
-				TextSize = 24, -- Reduced text size
+				TextSize = 20, -- Reduced from 32
 				TextXAlignment = "Left",
 				TextColor3 = Color3.new(1,1,1)
 			}),
@@ -1745,22 +1745,22 @@ function lib.BoxUiBase(title)
 				Name = "NoRound",
 				BackgroundColor3 = Color3.fromRGB(255, 170, 0),
 				BorderSizePixel = 0,
-				Position = UDim2.new(0,0,1,-8),
-				Size = UDim2.new(1,0,0,8)
+				Position = UDim2.new(0,0,1,-5),
+				Size = UDim2.new(1,0,0,5)
 			}),
 	
 			lib.Create("Frame", {
 				Name = "Inner",
 				BackgroundTransparency = 1,
-				Position = UDim2.new(0,8,0,30),
-				Size = UDim2.new(1,-8,1,-30),
+				Position = UDim2.new(0,5,0,30),
+				Size = UDim2.new(1,-5,1,-30),
 	
 				lib.Create("Frame", {
 					Name = "NoRoundBottom",
 					BackgroundColor3 = Color3.fromRGB(26, 28, 32),
 					BorderSizePixel = 0,
-					Position = UDim2.new(0,0,1,-8),
-					Size = UDim2.new(1,0,0,8)
+					Position = UDim2.new(0,0,1,-5),
+					Size = UDim2.new(1,0,0,5)
 				}),
 				lib.Create("Frame", {
 					Name = "Content",
@@ -1769,26 +1769,26 @@ function lib.BoxUiBase(title)
 					Size = UDim2.new(1,0,1,0),
 	
 					lib.Create("UICorner", {
-						CornerRadius = UDim.new(0,10) -- Slightly reduced corner radius
+						CornerRadius = UDim.new(0,10)
 					}),
 					lib.Create("Frame", {
 						Name = "Carousel",
 						BackgroundTransparency = 1,
-						Size = UDim2.new(0,120,1,0), -- Reduced width
+						Size = UDim2.new(0,75,1,0), -- Reduced from 150
 	
 						lib.Create("Frame", {
 							Name = "NoRound",
 							BackgroundColor3 = Color3.fromRGB(48, 51, 59),
 							BorderSizePixel = 0,
-							Position = UDim2.new(0,0,1,-8),
-							Size = UDim2.new(1,0,0,8)
+							Position = UDim2.new(0,0,1,-5),
+							Size = UDim2.new(1,0,0,5)
 						}),
 						lib.Create("Frame", {
 							Name = "NoRoundTop",
 							BackgroundColor3 = Color3.fromRGB(48, 51, 59),
 							BorderSizePixel = 0,
-							Position = UDim2.new(1,-16,0,0),
-							Size = UDim2.new(0,16,0,8)
+							Position = UDim2.new(1,-10,0,0),
+							Size = UDim2.new(0,10,0,5)
 						}),
 	
 						lib.Create("Frame", {
@@ -1796,17 +1796,16 @@ function lib.BoxUiBase(title)
 							BackgroundColor3 = Color3.fromRGB(48, 51, 59),
 							BorderSizePixel = 0,
 							Size = UDim2.new(1,0,1,0),
-
 	
 							lib.Create("UICorner", {
-								CornerRadius = UDim.new(0,10) -- Slightly reduced corner radius
+								CornerRadius = UDim.new(0,10)
 							}),
 							lib.Create("ScrollingFrame", {
 								Name = "List",
 								BackgroundTransparency = 1,
 								Size = UDim2.new(1,0,1,0),
 								ClipsDescendants = true,
-								ScrollBarThickness = 4, -- Reduced scrollbar thickness
+								ScrollBarThickness = 4,
 								CanvasSize = UDim2.new(),
 	
 								lib.Create("UIListLayout", {
@@ -1819,14 +1818,15 @@ function lib.BoxUiBase(title)
 						Name = "Tabs",
 						BackgroundColor3 = Color3.fromRGB(26, 28, 32),
 						BorderSizePixel = 0,
-						Position = UDim2.new(0,120,0,0), -- Adjusted for reduced Carousel width
-						Size = UDim2.new(1,-120,1,0), -- Adjusted for reduced Carousel width
+						Position = UDim2.new(0,75,0,0),
+						Size = UDim2.new(1,-75,1,0),
 					})
 				})
 			})
 		})
 	})
 
+	-- The rest of the function remains the same
 	new.BoxFrame = new.Gui.Main
 	new.Topbar = new.BoxFrame.Topbar
 	new.PrimaryFrame = new.BoxFrame
@@ -1883,28 +1883,27 @@ function uiBox:Tab(title)
 		Name = title,
 		BackgroundTransparency = 1,
 		LayoutOrder = #self.Tabs,
-		Size = UDim2.new(1,-6,0,50), -- -6 = ScrollBarThickness
+		Size = UDim2.new(1,-3,0,40), -- Reduced height from 50
 		Parent = self.CarouselContentFrame,
 
 		lib.Create("Frame", {
 			Name = "Filler",
 			BackgroundColor3 = Color3.fromRGB(61, 65, 75),
 			BorderSizePixel = 0,
-			Position = UDim2.new(0,10,0,7),
-			Size = UDim2.new(1,-20,1,-14),
-			Visible = false, -- <--
-			--ZIndex = 0,
+			Position = UDim2.new(0,5,0,5),
+			Size = UDim2.new(1,-10,1,-10),
+			Visible = false,
 
 			lib.Create("UICorner", {
-				CornerRadius = UDim.new(0,13)
+				CornerRadius = UDim.new(0,10)
 			})
 		}),
 		lib.Create("Frame", {
 			Name = "Separator",
 			BackgroundColor3 = Color3.fromRGB(213, 213, 213),
 			BorderSizePixel = 0,
-			Position = UDim2.new(0,10,1,-2),
-			Size = UDim2.new(1,-20,0,2),
+			Position = UDim2.new(0,5,1,-1),
+			Size = UDim2.new(1,-10,0,1),
 		}),
 		lib.Create("TextButton", {
 			Name = "ClickCapture",
@@ -1917,20 +1916,21 @@ function uiBox:Tab(title)
 			BackgroundTransparency = 1,
 			Size = UDim2.new(1,0,1,0),
 			Font = "SourceSansSemibold",
-			TextSize = 19,
+			TextSize = 14, -- Reduced from 19
 			Text = title,
 			TextColor3 = Color3.fromRGB(213, 213, 213),
 		})
 	})
 
+	-- The rest of the function remains the same
 	new.ContentFrame = lib.Create("ScrollingFrame", {
 		Name = title,
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
 		Size = UDim2.new(1,0,1,0),
 		ClipsDescendants = true,
-		ScrollBarThickness = 6,
-		CanvasSize = UDim2.new(), --calculated below
+		ScrollBarThickness = 4, -- Reduced from 6
+		CanvasSize = UDim2.new(),
 		Parent = self.TabsFrame,
 		Visible = false
 	})
@@ -1950,9 +1950,9 @@ function uiBox:Tab(title)
 		for i,v in pairs(self.Children) do
 			v:Position()
 		end
-		local Y = 10
+		local Y = 5 -- Reduced from 10
 		for i,v in pairs(self.Children) do
-			local posY = v.PrimaryFrame.Position.Y.Offset + v.PrimaryFrame.Size.Y.Offset + 10
+			local posY = v.PrimaryFrame.Position.Y.Offset + v.PrimaryFrame.Size.Y.Offset + 5 -- Reduced from 10
 			if posY > Y then
 				Y = posY
 			end
