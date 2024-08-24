@@ -1929,10 +1929,17 @@ function uiBox:Tab(title)
 		BorderSizePixel = 0,
 		Size = UDim2.new(1,0,1,0),
 		ClipsDescendants = true,
-		ScrollBarThickness = 4, -- Reduced from 6
+		ScrollBarThickness = 4,
 		CanvasSize = UDim2.new(),
 		Parent = self.TabsFrame,
-		Visible = false
+		Visible = false,
+
+		lib.Create("UIPadding", {
+			PaddingLeft = UDim.new(0, 5),
+			PaddingRight = UDim.new(0, 5),
+			PaddingTop = UDim.new(0, 5),
+			PaddingBottom = UDim.new(0, 5)
+		})
 	})
 
 	new.ClickCapture = new.CarouselTab.ClickCapture
@@ -1947,12 +1954,12 @@ function uiBox:Tab(title)
 	end
 
 	function new:Resize()
-		for i,v in pairs(self.Children) do
+		for _,v in pairs(self.Children) do
 			v:Position()
 		end
-		local Y = 5 -- Reduced from 10
+		local Y = 5
 		for i,v in pairs(self.Children) do
-			local posY = v.PrimaryFrame.Position.Y.Offset + v.PrimaryFrame.Size.Y.Offset + 5 -- Reduced from 10
+			local posY = v.PrimaryFrame.Position.Y.Offset + v.PrimaryFrame.Size.Y.Offset + 5
 			if posY > Y then
 				Y = posY
 			end
@@ -1974,21 +1981,20 @@ function uiBoxTab:Group(name, options)
 	new.GroupFrame = lib.Create("Frame", {
 		Name = "Group - " .. name,
 		BackgroundTransparency = 1,
-		--Position =
-		Size = UDim2.new(0, options.Width or 200, 0, 25 --[[this one is calculated on the go]]),
+		Size = UDim2.new(0, options.Width or 150, 0, 20), -- Reduced width and initial height
 		ClipsDescendants = true,
-		LayoutOrder = #self.Children, --for keeping track of the order
+		LayoutOrder = #self.Children,
 		Parent = self.ContentFrame,
 
 		lib.Create("Frame", {
 			Name = "Group",
 			BackgroundColor3 = Color3.fromRGB(213, 213, 213),
 			BorderSizePixel = 0,
-			Position = UDim2.new(0,0,0,10),
-			Size = UDim2.new(1,0,1,-10),
+			Position = UDim2.new(0,0,0,8), -- Adjusted position
+			Size = UDim2.new(1,0,1,-8),
 
 			lib.Create("UICorner", {
-				CornerRadius = UDim.new(0,13)
+				CornerRadius = UDim.new(0,8) -- Reduced corner radius
 			}),
 			lib.Create("Frame", {
 				Name = "Filler",
@@ -1998,18 +2004,19 @@ function uiBoxTab:Group(name, options)
 				Size = UDim2.new(1,-2,1,-2),
 
 				lib.Create("UICorner", {
-					CornerRadius = UDim.new(0,13)
+					CornerRadius = UDim.new(0,8) -- Reduced corner radius
 				})
 			}),
 			lib.Create("Frame", {
 				Name = "Content",
 				BackgroundTransparency = 1,
-				Position = UDim2.new(0,2,0,20),
-				Size = UDim2.new(1,-4,1,-24),
+				Position = UDim2.new(0,2,0,16), -- Adjusted position
+				Size = UDim2.new(1,-4,1,-18), -- Adjusted size
 
 				lib.Create("UIListLayout", {
 					SortOrder = "LayoutOrder",
-					HorizontalAlignment = "Center"
+					HorizontalAlignment = "Center",
+					Padding = UDim.new(0, 4) -- Added small padding between elements
 				})
 			})
 		}),
@@ -2017,29 +2024,27 @@ function uiBoxTab:Group(name, options)
 			Name = "Title",
 			BackgroundColor3 = Color3.fromRGB(26, 28, 32),
 			BorderSizePixel = 0,
-			Position = UDim2.new(0,20,0,0),
-			--Size = UDim2.new(0,x,0,20),
+			Position = UDim2.new(0,10,0,0),
 			Font = "SourceSans",
 			Text = name,
 			TextColor3 = Color3.fromRGB(213, 213, 213),
-			TextSize = 20,
+			TextSize = 14, -- Reduced text size
 		})
 	})
 
 	do
 		local titleLabel = new.GroupFrame.Title
-		titleLabel.Size = UDim2.new(0, game:GetService("TextService"):GetTextSize(titleLabel.Text, titleLabel.TextSize, titleLabel.Font, Vector2.new(999,999)).X + 22, 0, 20)
+		titleLabel.Size = UDim2.new(0, game:GetService("TextService"):GetTextSize(titleLabel.Text, titleLabel.TextSize, titleLabel.Font, Vector2.new(999,999)).X + 10, 0, 16)
 	end
 
 	new.PrimaryFrame = new.GroupFrame
 	new.ContentFrame = new.GroupFrame.Group.Content
 	new.ContentUILayout = new.ContentFrame.UIListLayout
 
-	function new:Position() --determine the collumns basing on the first horizontal row
+	function new:Position()
 		local collumn = options.Collumn
-		local X, Y = 20, 10
+		local X, Y = 10, 5 -- Reduced initial position
 		if self.GroupFrame.LayoutOrder > 0 then
-			--figure out the X and Y pos
 			local found = false
 			for i,v in pairs(self.ParentObj.Children) do
 				if v == self then
@@ -2047,14 +2052,14 @@ function uiBoxTab:Group(name, options)
 				end
 				if v.Collumn == collumn then
 					X = v.GroupFrame.Position.X.Offset
-					Y = v.GroupFrame.Position.Y.Offset + v.GroupFrame.AbsoluteSize.Y + 10
+					Y = v.GroupFrame.Position.Y.Offset + v.GroupFrame.AbsoluteSize.Y + 5 -- Reduced spacing
 					found = true
 				end
 			end
 
-			if not found then --first group in the 2nd collumn
+			if not found then
 				local prev = self.ParentObj.Children[self.GroupFrame.LayoutOrder].PrimaryFrame
-				X = prev.Position.X.Offset + prev.AbsoluteSize.X + 20
+				X = prev.Position.X.Offset + prev.AbsoluteSize.X + 10 -- Reduced spacing
 			end
 		end
 		new.GroupFrame.Position = UDim2.new(0,X,0,Y)
