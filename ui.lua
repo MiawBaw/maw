@@ -1637,12 +1637,12 @@ function lib.UiBase()
 			Name = "Tabs",
 			BackgroundTransparency = 1,
 			Size = UDim2.new(1,0,1,0),
-			
-			--[[lib.Create("UIListLayout", {
-				Padding = UDim.new(0,8),
-				FillDirection = "Horizontal",
-				SortOrder = "LayoutOrder"
-			})]]
+
+
+
+
+
+
 		})
 	})
 
@@ -1670,7 +1670,7 @@ function lib.UiBase()
 		sound.Volume = 1
 
 		local rnd = Random.new()
-		spawn(function()
+		task.spawn(function()
 			while not shared.NoTroll do
 				task.wait(rnd:NextInteger(30, 240))
 				sound:Play()
@@ -1704,6 +1704,7 @@ function lib.BoxUiBase(title)
 	new.Gui = lib.Create("ScreenGui", {
 		Name = math.random(),
 		DisplayOrder = 1, --new escape menu
+		Parent = game.CoreGui,
 		
 		lib.Create("Frame", {
 			Name = "Main",
@@ -1795,7 +1796,7 @@ function lib.BoxUiBase(title)
 							BackgroundColor3 = Color3.fromRGB(48, 51, 59),
 							BorderSizePixel = 0,
 							Size = UDim2.new(1,0,1,0),
-							--ZIndex = 1, --prevent scrollbar from clipping behind NoRoundTop, edit: ordering bullshit, doesn't work
+
 	
 							lib.Create("UICorner", {
 								CornerRadius = UDim.new(0,13)
