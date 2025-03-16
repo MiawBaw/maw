@@ -1,5 +1,3 @@
-
-
 local Christmas = false
 local AprilFools = false
 do
@@ -2034,29 +2032,52 @@ function uiBoxTab:Group(name, options)
 	new.ContentFrame = new.GroupFrame.Group.Content
 	new.ContentUILayout = new.ContentFrame.UIListLayout
 
-	function new:Position() --determine the collumns basing on the first horizontal row
-		local collumn = options.Collumn
+	function new:Position() --determine the columns based on the first horizontal row
+		local column = options.Collumn
 		local X, Y = 20, 10
+		
 		if self.GroupFrame.LayoutOrder > 0 then
 			--figure out the X and Y pos
 			local found = false
+			local lastInColumn = nil
+			
 			for i,v in pairs(self.ParentObj.Children) do
 				if v == self then
 					break
 				end
-				if v.Collumn == collumn then
-					X = v.GroupFrame.Position.X.Offset
-					Y = v.GroupFrame.Position.Y.Offset + v.GroupFrame.AbsoluteSize.Y + 10
+				if v.Collumn == column then
 					found = true
+					-- Track the last element in this column to stack properly
+					if not lastInColumn or v.GroupFrame.Position.Y.Offset > lastInColumn.GroupFrame.Position.Y.Offset then
+						lastInColumn = v
+					end
 				end
 			end
-
-			if not found then --first group in the 2nd collumn
-				local prev = self.ParentObj.Children[self.GroupFrame.LayoutOrder].PrimaryFrame
-				X = prev.Position.X.Offset + prev.AbsoluteSize.X + 20
+			
+			if found and lastInColumn then
+				X = lastInColumn.GroupFrame.Position.X.Offset
+				Y = lastInColumn.GroupFrame.Position.Y.Offset + lastInColumn.GroupFrame.AbsoluteSize.Y + 10
+			elseif not found then --first group in the next column
+				-- Find the rightmost group in any previous column
+				local rightmostGroup = nil
+				for i,v in pairs(self.ParentObj.Children) do
+					if v == self then
+						break
+					end
+					if not rightmostGroup or 
+					   (v.GroupFrame.Position.X.Offset + v.GroupFrame.AbsoluteSize.X) > 
+					   (rightmostGroup.GroupFrame.Position.X.Offset + rightmostGroup.GroupFrame.AbsoluteSize.X) then
+						rightmostGroup = v
+					end
+				end
+				
+				if rightmostGroup then
+					X = rightmostGroup.GroupFrame.Position.X.Offset + rightmostGroup.GroupFrame.AbsoluteSize.X + 20
+				end
 			end
 		end
-		new.GroupFrame.Position = UDim2.new(0,X,0,Y)
+		
+		self.GroupFrame.Position = UDim2.new(0,X,0,Y)
 	end
 
 	if options.Position then
