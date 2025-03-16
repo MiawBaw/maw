@@ -143,41 +143,30 @@ function uiTab:CheckBox(name, callback, id)
 	new.CheckBoxFrame = lib.Create("Frame", {
 		Name = name,
 		BackgroundTransparency = 1,
-		LayoutOrder = #self.Children, --0, 1, 2
-		Size = UDim2.new(1,0,0,25),
+		LayoutOrder = #self.Children,
+		Size = UDim2.new(1,0,0,32), -- Increased height for more spacing
 		Parent = self.ContentFrame,
 		
-		lib.Create("ImageButton", {
+		lib.Create("Frame", {
 			Name = "Toggle",
-			BackgroundTransparency = 1,
-			Position = UDim2.new(0,12,0,0),
-			Size = UDim2.new(0,19,0,19),
-			Image = "rbxassetid://2260429633",
-			ImageColor3 = Color3.fromRGB(43, 47, 55),
-			ScaleType = "Slice",
-			SliceCenter = Rect.new(12,12,13,13),
+			BackgroundColor3 = Color3.fromRGB(43, 47, 55),
+			Position = UDim2.new(0,12,0.5,-10),
+			Size = UDim2.new(0,36,0,20), -- Modern toggle size
+			BorderSizePixel = 0,
 			
-			lib.Create("ImageButton", {
-				Name = "Filler",
-				AnchorPoint = Vector2.new(0.5,0.5),
-				BackgroundTransparency = 1,
-				Position = UDim2.new(0.5,0,0.5,0),
-				Size = UDim2.new(0,13,0,13),
-				Image = "rbxassetid://2260429633",
-				ImageColor3 = Color3.fromRGB(26, 28, 32),
-				ScaleType = "Slice",
-				SliceCenter = Rect.new(12,12,13,13),
+			lib.Create("UICorner", {
+				CornerRadius = UDim.new(1,0) -- Full rounded corners for pill shape
+			}),
+			
+			lib.Create("Frame", {
+				Name = "Indicator",
+				AnchorPoint = Vector2.new(0,0.5),
+				BackgroundColor3 = Color3.fromRGB(200, 200, 200),
+				Position = UDim2.new(0,2,0.5,0),
+				Size = UDim2.new(0,16,0,16), -- Circle indicator
 				
-				lib.Create("ImageButton", {
-					Name = "Inner",
-					AnchorPoint = Vector2.new(0.5,0.5),
-					BackgroundTransparency = 1,
-					Position = UDim2.new(0.5,0,0.5,0),
-					Size = UDim2.new(0,9,0,9),
-					Image = "rbxassetid://2260429633",
-					ImageColor3 = Color3.fromRGB(26, 28, 32),
-					ScaleType = "Slice",
-					SliceCenter = Rect.new(12,12,13,13)
+				lib.Create("UICorner", {
+					CornerRadius = UDim.new(1,0) -- Circle
 				})
 			}),
 			
@@ -185,12 +174,12 @@ function uiTab:CheckBox(name, callback, id)
 				Name = "Label",
 				AnchorPoint = Vector2.new(0,0.5),
 				BackgroundTransparency = 1,
-				Position = UDim2.new(1,5,0.5,0),
+				Position = UDim2.new(1,10,0.5,0),
 				Size = UDim2.new(1,0,1,0),
 				Font = "GothamSemibold",
 				Text = name,
 				TextColor3 = Color3.fromRGB(95, 96, 99),
-				TextSize = 15,
+				TextSize = 16, -- Slightly larger text
 				TextXAlignment = "Left"
 			})
 		})
@@ -203,21 +192,15 @@ function uiTab:CheckBox(name, callback, id)
 			DefaultColor = Color3.fromRGB(255, 170, 0),
 			DisabledColor = Color3.fromRGB(43, 47, 55),
 			ChangeColor = true,
-			Property = "ImageColor3"
+			Property = "BackgroundColor3"
 		},
-		Filler = {
-			Object = new.CheckBoxFrame.Toggle.Filler,
+		Indicator = {
+			Object = new.CheckBoxFrame.Toggle.Indicator,
 			
-			DefaultColor = Color3.fromRGB(26, 28, 32),
-			ChangeColor = false,
-		},
-		Inner = {
-			Object = new.CheckBoxFrame.Toggle.Filler.Inner,
-			
-			DefaultColor = Color3.fromRGB(255, 170, 0),
-			DisabledColor = Color3.fromRGB(26, 28, 32),
+			DefaultColor = Color3.new(1,1,1),
+			DisabledColor = Color3.fromRGB(200, 200, 200),
 			ChangeColor = true,
-			Property = "ImageColor3"
+			Property = "BackgroundColor3"
 		},
 		Label = {
 			Object = new.CheckBoxFrame.Toggle.Label,
@@ -253,7 +236,7 @@ function uiTab:CheckBox(name, callback, id)
 		label.TextYAlignment = "Top"
 		
 		local y = game:GetService("TextService"):GetTextSize(label.Text, label.TextSize, label.Font, Vector2.new(999,999)).Y
-		y = y + 7 --offset
+		y = y + 10 --increased offset for spacing
 		self.CheckBoxFrame.Size = UDim2.new(1,0,0,y)
 		self.ParentObj:Resize()
 	end
@@ -262,8 +245,8 @@ function uiTab:CheckBox(name, callback, id)
 		local bindBox = lib.Create("TextBox", {
 			Name = "Keybind",
 			BackgroundTransparency = 1,
-			Position = UDim2.new(1,-37,0,0), -- -37 = -32 (width) and -5 (padding)
-			Size = UDim2.new(0,32,0,22),
+			Position = UDim2.new(1,-42,0,0), -- -42 = -37 (previous) - 5 (more padding)
+			Size = UDim2.new(0,36,0,24), -- Slightly larger
 			Font = "GothamSemibold",
 			TextColor3 = self.Checked and Color3.new(1,1,1) or Color3.fromRGB(95, 96, 99),
 			TextSize = 16,
@@ -328,13 +311,27 @@ function uiTab:CheckBox(name, callback, id)
 		
 		for i,v in pairs(new.Components) do
 			if v.ChangeColor then
-				--v.Object[v.Property] = v[index]
 				if v.Tween then
 					v.Tween:Pause()
 				end
-				v.Tween = lib.Tween(0.1, v.Object, v.Property, v[index])
+				v.Tween = lib.Tween(0.2, v.Object, v.Property, v[index])
 			end
 		end
+		
+		-- Modern toggle animation
+		local indicator = new.Components.Indicator.Object
+		if new.IndicatorTween then
+			new.IndicatorTween:Cancel()
+		end
+		
+		local targetPosition
+		if new.Checked then
+			targetPosition = UDim2.new(1,-18,0.5,0)
+		else
+			targetPosition = UDim2.new(0,2,0.5,0)
+		end
+		
+		new.IndicatorTween = lib.Tween(0.2, indicator, "Position", targetPosition)
 		
 		if self.Opened == false then
 			self:Expand(true)
@@ -349,8 +346,7 @@ function uiTab:CheckBox(name, callback, id)
 	new.PrimaryFrame = new.CheckBoxFrame
 	
 	new.Components.Toggle.Object.MouseButton1Click:Connect(new.Click)
-	new.Components.Filler.Object.MouseButton1Click:Connect(new.Click)
-	new.Components.Inner.Object.MouseButton1Click:Connect(new.Click)
+	new.Components.Indicator.Object.MouseButton1Click:Connect(new.Click)
 	new.Components.Label.Object.MouseButton1Click:Connect(new.Click)
 
 	self:Resize()
@@ -377,8 +373,8 @@ function uiTab:Slider(options, callback, id)
 		Name = "Slider",
 		AnchorPoint = Vector2.new(0,0.5),
 		BackgroundTransparency = 1,
-		Position = UDim2.new(0,12,0,45),
-		Size = UDim2.new(1,-24,0,37),
+		Position = UDim2.new(0,12,0,55), -- Increased spacing
+		Size = UDim2.new(1,-32,0,45), -- More height for better spacing
 		LayoutOrder = #self.Children,
 		Parent = options.Parent and options.Parent.PrimaryFrame or self.ContentFrame,
 		
@@ -387,42 +383,49 @@ function uiTab:Slider(options, callback, id)
 			AnchorPoint = Vector2.new(0,0.5),
 			BackgroundTransparency = 1,
 			Position = UDim2.new(0,0,0.25,0),
-			Size = UDim2.new(1,0,0,4),
+			Size = UDim2.new(1,0,0,6), -- Increased thickness
 			Image = "rbxassetid://2260429633",
 			ImageColor3 = Color3.fromRGB(43, 47, 55),
 			ScaleType = "Slice",
 			SliceCenter = Rect.new(12,12,13,13),
 			
-			lib.Create("ImageLabel", {
+			lib.Create("Frame", {
 				Name = "Filler",
-				BackgroundTransparency = 1,
-				Size = UDim2.new(0,3,1,0), --x scale changes with the slider
-				Image = "rbxassetid://2260429633",
-				ImageColor3 = Color3.fromRGB(255, 170, 0),
-				ScaleType = "Slice",
-				SliceCenter = Rect.new(12,12,13,13)
+				BackgroundColor3 = Color3.fromRGB(255, 170, 0),
+				Size = UDim2.new(0,3,1,0), -- x scale changes with the slider
+				BorderSizePixel = 0,
+				
+				lib.Create("UICorner", {
+					CornerRadius = UDim.new(0,3) -- Rounded edges
+				})
 			}),
 			
 			lib.Create("ImageButton", {
 				Name = "DraggableBtn",
 				AnchorPoint = Vector2.new(0.5,0.5),
-				BackgroundTransparency = 1,
-				Position = UDim2.new(0,0,0.5,0), --x scale changes with the slider
-				Size = UDim2.new(0,10,0,17),
-				Image = "rbxassetid://2260429633",
-				ImageColor3 = Color3.new(1,1,1),
-				ScaleType = "Slice",
-				SliceCenter = Rect.new(12,12,13,13)
+				BackgroundColor3 = Color3.new(1,1,1),
+				BorderSizePixel = 0,
+				Position = UDim2.new(0,0,0.5,0), -- x scale changes with the slider
+				Size = UDim2.new(0,16,0,16), -- Larger handle
+				
+				lib.Create("UICorner", {
+					CornerRadius = UDim.new(1,0) -- Circle handle
+				}),
+				
+				lib.Create("UIStroke", {
+					Color = Color3.fromRGB(200, 200, 200),
+					Thickness = 1
+				})
 			}),
 		}),
 		
 		lib.Create("TextBox", {
 			Name = "Label",
 			BackgroundTransparency = 1,
-			Size = UDim2.new(1,0,1,-5),
+			Size = UDim2.new(1,0,1,-10), -- More space
 			Font = "GothamSemibold",
 			Text = "",
-			TextSize = 12,
+			TextSize = 14, 
 			TextYAlignment = "Bottom",
 			TextColor3 = Color3.new(1,1,1)
 		}),
@@ -430,7 +433,7 @@ function uiTab:Slider(options, callback, id)
 		lib.Create("TextButton", {
 			Name = "ClickCapture",
 			BackgroundTransparency = 1,
-			Size = UDim2.new(1,0,1,-14), -- -14 to make space for label clicking
+			Size = UDim2.new(1,0,1,-16), -- More space for label
 			Text = ""
 		})
 	})
@@ -612,20 +615,21 @@ function uiTab:Button(text, callback)
 	new.ButtonFrame = lib.Create("Frame", {
 		Name = text,
 		BackgroundTransparency = 1,
-		Size = UDim2.new(1,0,0,27),
+		Size = UDim2.new(1,0,0,35), -- Increased height
 		LayoutOrder = #self.Children,
 		Parent = self.ContentFrame,
 		
 		lib.Create("ImageButton", {
 			Name = "Button",
-			BackgroundTransparency = 1,
+			BackgroundColor3 = new.DefaultColor,
+			BorderSizePixel = 0,
 			AnchorPoint = Vector2.new(0.5,0),
 			Position = UDim2.new(0.5,0,0,0),
-			Size = UDim2.new(1,-12,0,22),
-			Image = "rbxassetid://2260429633",
-			ImageColor3 = new.DefaultColor,
-			ScaleType = "Slice",
-			SliceCenter = Rect.new(12,12,13,13),
+			Size = UDim2.new(1,-18,0,28), -- Taller button with more side padding
+			
+			lib.Create("UICorner", {
+				CornerRadius = UDim.new(0,6) -- Rounded corners
+			}),
 			
 			lib.Create("TextLabel", {
 				Name = "Label",
@@ -711,12 +715,12 @@ function uiTab:Label(text)
 	
 	new.LabelObj = lib.Create("TextLabel", {
 		BackgroundTransparency = 1,
-		Size = UDim2.new(1,0,0,29),
+		Size = UDim2.new(1,0,0,35), -- Increased height
 		LayoutOrder = #self.Children,
 		Text = text,
 		Font = "GothamSemibold",
 		TextColor3 = Color3.new(1,1,1),
-		TextSize = 15,
+		TextSize = 16, -- Slightly larger
 		Parent = self.ContentFrame
 	})
 	
@@ -745,36 +749,49 @@ function uiTab:Dropdown(options, callback, id)
 		Name = "Dropdown - " .. options.Text,
 		BackgroundTransparency = 1,
 		LayoutOrder = #self.Children,
-		Size = UDim2.new(1,0,0,35),
+		Size = UDim2.new(1,0,0,40), -- Increased height
 		Parent = self.ContentFrame,
 		
 		lib.Create("Frame", {
 			Name = "Dummy",
 			BackgroundTransparency = 1,
 			ClipsDescendants = true,
-			Size = UDim2.new(1,0,0,30),
+			Size = UDim2.new(1,0,0,35), -- Increased height
 			ZIndex = 2,
 			
 			lib.Create("UIListLayout", {
 				HorizontalAlignment = "Center",
-				SortOrder = "LayoutOrder"
+				SortOrder = "LayoutOrder",
+				Padding = UDim.new(0, 2) -- Added padding between items
 			}),
 			
-			lib.Create("TextLabel", {
+			lib.Create("Frame", {
 				Name = "Title",
 				BackgroundColor3 = Color3.fromRGB(27, 42, 53),
 				BorderSizePixel = 0,
-				Size = UDim2.new(1,0,0,30),
-				Font = "GothamBold",
-				Text = options.Text,
-				TextColor3 = Color3.new(1,1,1),
-				TextSize = 15,
+				Size = UDim2.new(1,0,0,35), -- Increased height
+				
+				lib.Create("UICorner", {
+					CornerRadius = UDim.new(0,6) -- Rounded corners
+				}),
+				
+				lib.Create("TextLabel", {
+					Name = "Label",
+					BackgroundTransparency = 1,
+					Size = UDim2.new(1,-40,1,0),
+					Position = UDim2.new(0,10,0,0),
+					Font = "GothamBold",
+					Text = options.Text,
+					TextColor3 = Color3.new(1,1,1),
+					TextSize = 15,
+					TextXAlignment = "Left"
+				}),
 				
 				lib.Create("TextButton", {
 					Name = "Expand",
 					BackgroundTransparency = 1,
-					Position = UDim2.new(1,-30,0,0),
-					Size = UDim2.new(0,30,1,0),
+					Position = UDim2.new(1,-35,0,0),
+					Size = UDim2.new(0,35,1,0),
 					Font = "GothamBold",
 					Text = "V",
 					TextColor3 = Color3.new(1,1,1),
@@ -1710,12 +1727,12 @@ function lib.BoxUiBase(title)
 			BackgroundColor3 = Color3.fromRGB(255, 170, 0),
 			BorderSizePixel = 0,
 			Position = UDim2.new(0.5,0,0.5,0),
-			Size = UDim2.new(0,480,0,350), -- Increased width for mobile
+			Size = UDim2.new(0,520,0,380), -- Increased overall size
 			
 			lib.Create("Frame", {
 				Name = "Topbar",
 				BackgroundTransparency = 1,
-				Size = UDim2.new(1,0,0,30), -- Reduced size for mobile
+				Size = UDim2.new(1,0,0,35), -- Increased height
 			}),
 			lib.Create("TextButton", {
 				Name = "MouseUnlock",
@@ -1726,16 +1743,16 @@ function lib.BoxUiBase(title)
 				Text = ""
 			}),
 			lib.Create("UICorner", {
-				CornerRadius = UDim.new(0,13)
+				CornerRadius = UDim.new(0,16) -- More rounded corners
 			}),
 			lib.Create("TextLabel", {
 				Name = "Title",
 				BackgroundTransparency = 1,
-				Position = UDim2.new(0,10,0,0),
-				Size = UDim2.new(1,-10,0,30), -- Reduced size for mobile
+				Position = UDim2.new(0,16,0,0), -- More padding
+				Size = UDim2.new(1,-16,0,35),
 				Font = "SourceSansSemibold",
 				Text = title or "",
-				TextSize = 24, -- Reduced font size for mobile
+				TextSize = 26, -- Larger title
 				TextXAlignment = "Left",
 				TextColor3 = Color3.new(1,1,1)
 			}),
@@ -1743,22 +1760,22 @@ function lib.BoxUiBase(title)
 				Name = "NoRound",
 				BackgroundColor3 = Color3.fromRGB(255, 170, 0),
 				BorderSizePixel = 0,
-				Position = UDim2.new(0,0,1,-5), -- Reduced size for mobile
-				Size = UDim2.new(1,0,0,5) -- Reduced size for mobile
+				Position = UDim2.new(0,0,1,-6),
+				Size = UDim2.new(1,0,0,6)
 			}),
 	
 			lib.Create("Frame", {
 				Name = "Inner",
 				BackgroundTransparency = 1,
-				Position = UDim2.new(0,5,0,30), -- Reduced size for mobile
-				Size = UDim2.new(1,-5,1,-30), -- Reduced size for mobile
+				Position = UDim2.new(0,6,0,35),
+				Size = UDim2.new(1,-6,1,-35),
 	
 				lib.Create("Frame", {
 					Name = "NoRoundBottom",
 					BackgroundColor3 = Color3.fromRGB(26, 28, 32),
 					BorderSizePixel = 0,
-					Position = UDim2.new(0,0,1,-5), -- Reduced size for mobile
-					Size = UDim2.new(1,0,0,5) -- Reduced size for mobile
+					Position = UDim2.new(0,0,1,-6),
+					Size = UDim2.new(1,0,0,6)
 				}),
 				lib.Create("Frame", {
 					Name = "Content",
@@ -1767,26 +1784,26 @@ function lib.BoxUiBase(title)
 					Size = UDim2.new(1,0,1,0),
 	
 					lib.Create("UICorner", {
-						CornerRadius = UDim.new(0,13)
+						CornerRadius = UDim.new(0,16)
 					}),
 					lib.Create("Frame", {
 						Name = "Carousel",
 						BackgroundTransparency = 1,
-						Size = UDim2.new(0,120,1,0), -- Increased width for mobile
+						Size = UDim2.new(0,140,1,0), -- Wider sidebar
 	
 						lib.Create("Frame", {
 							Name = "NoRound",
 							BackgroundColor3 = Color3.fromRGB(48, 51, 59),
 							BorderSizePixel = 0,
-							Position = UDim2.new(0,0,1,-5), -- Reduced size for mobile
-							Size = UDim2.new(1,0,0,5) -- Reduced size for mobile
+							Position = UDim2.new(0,0,1,-6),
+							Size = UDim2.new(1,0,0,6)
 						}),
 						lib.Create("Frame", {
 							Name = "NoRoundTop",
 							BackgroundColor3 = Color3.fromRGB(48, 51, 59),
 							BorderSizePixel = 0,
-							Position = UDim2.new(1,-10,0,0), -- Reduced size for mobile
-							Size = UDim2.new(0,10,0,5) -- Reduced size for mobile
+							Position = UDim2.new(1,-12,0,0),
+							Size = UDim2.new(0,12,0,6)
 						}),
 	
 						lib.Create("Frame", {
@@ -1794,21 +1811,21 @@ function lib.BoxUiBase(title)
 							BackgroundColor3 = Color3.fromRGB(48, 51, 59),
 							BorderSizePixel = 0,
 							Size = UDim2.new(1,0,1,0),
-
 	
 							lib.Create("UICorner", {
-								CornerRadius = UDim.new(0,13)
+								CornerRadius = UDim.new(0,16)
 							}),
 							lib.Create("ScrollingFrame", {
 								Name = "List",
 								BackgroundTransparency = 1,
 								Size = UDim2.new(1,0,1,0),
 								ClipsDescendants = true,
-								ScrollBarThickness = 4, -- Reduced size for mobile
+								ScrollBarThickness = 6,
 								CanvasSize = UDim2.new(),
 	
 								lib.Create("UIListLayout", {
 									SortOrder = "LayoutOrder",
+									Padding = UDim.new(0, 6) -- Added padding between items
 								})
 							})
 						})
@@ -1817,8 +1834,8 @@ function lib.BoxUiBase(title)
 						Name = "Tabs",
 						BackgroundColor3 = Color3.fromRGB(26, 28, 32),
 						BorderSizePixel = 0,
-						Position = UDim2.new(0,110,0,0), -- Increased width for mobile
-						Size = UDim2.new(1,-110,1,0), -- Increased width for mobile
+						Position = UDim2.new(0,140,0,0), -- Match the wider sidebar
+						Size = UDim2.new(1,-140,1,0),
 					})
 				})
 			})
@@ -1880,28 +1897,27 @@ function uiBox:Tab(title)
 		Name = title,
 		BackgroundTransparency = 1,
 		LayoutOrder = #self.Tabs,
-		Size = UDim2.new(1,-6,0,50), -- -6 = ScrollBarThickness
+		Size = UDim2.new(1,-8,0,60), -- Increased height
 		Parent = self.CarouselContentFrame,
 
 		lib.Create("Frame", {
 			Name = "Filler",
 			BackgroundColor3 = Color3.fromRGB(61, 65, 75),
 			BorderSizePixel = 0,
-			Position = UDim2.new(0,10,0,7),
-			Size = UDim2.new(1,-20,1,-14),
-			Visible = false, -- <--
-			--ZIndex = 0,
+			Position = UDim2.new(0,12,0,8), -- More padding
+			Size = UDim2.new(1,-24,1,-16), -- More padding
+			Visible = false,
 
 			lib.Create("UICorner", {
-				CornerRadius = UDim.new(0,13)
+				CornerRadius = UDim.new(0,14) -- More rounded
 			})
 		}),
 		lib.Create("Frame", {
 			Name = "Separator",
 			BackgroundColor3 = Color3.fromRGB(213, 213, 213),
 			BorderSizePixel = 0,
-			Position = UDim2.new(0,10,1,-2),
-			Size = UDim2.new(1,-20,0,2),
+			Position = UDim2.new(0,12,1,-2),
+			Size = UDim2.new(1,-24,0,2),
 		}),
 		lib.Create("TextButton", {
 			Name = "ClickCapture",
@@ -1914,7 +1930,7 @@ function uiBox:Tab(title)
 			BackgroundTransparency = 1,
 			Size = UDim2.new(1,0,1,0),
 			Font = "SourceSansSemibold",
-			TextSize = 19,
+			TextSize = 21, -- Larger text
 			Text = title,
 			TextColor3 = Color3.fromRGB(213, 213, 213),
 		})
