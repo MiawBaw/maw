@@ -212,7 +212,13 @@ function uiTab:CheckBox(name, callback, id)
 		}
 	}
 	
-	--fix checkbox label size--
+	-- Add backward compatibility properties to support legacy scripts
+	-- This allows old scripts to still reference the old structure
+	new.CheckBoxFrame.Toggle.Filler = {
+		Inner = {}
+	}
+	
+	-- Fix checkbox label size
 	do
 		local label = new.Components.Label.Object
 		label.Size = UDim2.new(0,game:GetService("TextService"):GetTextSize(label.Text, label.TextSize, label.Font, Vector2.new(999,999)).X, 1, 0)
@@ -333,7 +339,7 @@ function uiTab:CheckBox(name, callback, id)
 		
 		new.IndicatorTween = lib.Tween(0.2, indicator, "Position", targetPosition)
 		
-		if self.Opened == false then
+		if self and self.Opened == false then
 			self:Expand(true)
 		end
 		
@@ -345,9 +351,21 @@ function uiTab:CheckBox(name, callback, id)
 	
 	new.PrimaryFrame = new.CheckBoxFrame
 	
+	-- Connect click events to all relevant objects to ensure toggle works consistently
 	new.Components.Toggle.Object.MouseButton1Click:Connect(new.Click)
 	new.Components.Indicator.Object.MouseButton1Click:Connect(new.Click)
 	new.Components.Label.Object.MouseButton1Click:Connect(new.Click)
+	
+	-- Add click area covering the whole checkbox frame for better usability
+	local clickArea = lib.Create("TextButton", {
+		Name = "ClickArea",
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1,0,1,0),
+		Text = "",
+		Parent = new.CheckBoxFrame,
+		ZIndex = 0 -- Place behind other elements
+	})
+	clickArea.MouseButton1Click:Connect(new.Click)
 
 	self:Resize()
 	table.insert(self.Children, new)
